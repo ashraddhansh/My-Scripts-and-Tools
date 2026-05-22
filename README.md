@@ -13,7 +13,7 @@ Converts a CSV file into an HTML table.
 A utility for changing wallpapers in Hyprland.
 
 ## `define.sh`
-A quick dictionary lookup tool. Pass a word as an argument and it fetches the definition using the #[api.dictionaryapi.dev](#"https://api.dictionaryapi.dev") API.
+A quick dictionary lookup tool. Pass a word as an argument and it fetches the definition using the [Free Dictionary API](https://dictionaryapi.dev/) API.
 
 ## `outline`
 Extracts and displays the outline or table of contents from a PDF or book.
