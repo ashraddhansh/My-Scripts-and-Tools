@@ -1,0 +1,14 @@
+#!/bin/env bash
+
+# Hardcoded directory to search
+SEARCH_DIR="$HOME/Documents/Books/"
+
+# Use fzf to select a file
+file=$(find "$SEARCH_DIR" -type f -name "*.pdf" 2>/dev/null | fzf -e)
+
+# If a file was selected, open with zathura
+if [[ -n "$file" ]]; then
+    nohup zathura "$file" >/dev/null 2>&1 &
+else
+    echo "No file selected."
+fi

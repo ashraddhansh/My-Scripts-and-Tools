@@ -1,0 +1,24 @@
+#!/bin/zsh
+
+# Check if the file path is provided as an argument
+if [ -z "$1" ]; then
+  echo "Usage: ./cwall /path/to/new_image.jpg"
+  exit 1
+fi
+
+# Hyprpaper config file
+config_file="$HOME/.local/share/chezmoi/dot_config/hypr/hyprpaper.conf"
+
+# Resolve absolute path of the image
+new_image="$(realpath "$1")"
+
+# Update only the path inside the wallpaper block
+# This replaces any line starting with "path =" inside the file
+sed -i -E "s|^[[:space:]]*path[[:space:]]*=[[:space:]]*.*|    path = $new_image|" "$config_file"
+
+# Restart Hyprpaper to apply changes
+killall hyprpaper 2>/dev/null
+nohup hyprpaper >/dev/null 2>&1 &
+chezmoi apply
+
+echo "Wallpaper updated to $new_image and Hyprpaper restarted."

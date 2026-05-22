@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DEFAULT_MB=2
+MAX_MB=$DEFAULT_MB
+
+LEVELS=(
+  "/printer"
+  "/ebook"
+  "/screen"
+)
+
+show_help() {
+cat << EOF
+Usage:
+  compress-pdf [OPTIONS] <file.pdf>
+
+Compress a PDF using Ghostscript until it falls below a target size.
+
+Arguments:
+  <file.pdf>              PDF file to compress
+
+Options:
+  -s, --size <MB>         Maximum target size in MB (default: ${DEFAULT_MB})
+  -h, --help              Show this help message
+
+EOF
+}
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -s|--size)
+            if [[ -z "${2:-}" ]]; then
+                echo "Error: Missing value for $1"
+                exit 1
+            fi
+            MAX_MB="$2"
+            shift 2
+            ;;
+        -h|--help)
+            show_help
+            exit 0
+            ;;
+        -*)
+            echo "Unknown option: $1"
+            echo "Use --help"
+            exit 1
+            ;;
+        *)
+            PDF="$1"
+            shift
+            ;;
+    esac
+done
+
+# Validate input file
+if [[ -z "${PDF:-}" ]]; then
+    echo "Error: No PDF file specified"
+    echo "Use --help"
+    exit 1
+fi
+
+if [[ ! -f "$PDF" ]]; then
+    echo "Error: File not found: $PDF"
+    exit 1
+fi
+
+if [[ "$PDF" != *.pdf ]]; then
+    echo "Error: Input must be a PDF"
+    exit 1
+fi
+
+MAX_BYTES=$((MAX_MB * 1024 * 1024))
+
+size=$(stat -c%s "$PDF")
+
+if [ "$size" -le "$MAX_BYTES" ]; then
+    echo "Skipping (already under ${MAX_MB}MB): $PDF"
+    exit 0
+fi
+
+echo "----------------------------------------"
+echo "Compressing: $PDF"
+echo "Target size: ${MAX_MB}MB"
+echo "Original size: $((size / 1024 / 1024)) MB"
+
+base="${PDF%.pdf}"
+tmp_out="${base}.compressed.tmp.pdf"
+
+success=0
+
+for level in "${LEVELS[@]}"; do
+    echo "Trying Ghostscript setting: $level"
+
+    gs -sDEVICE=pdfwrite \
+        -dCompatibilityLevel=1.4 \
+        -dPDFSETTINGS="$level" \
+        -dNOPAUSE -dQUIET -dBATCH \
+        -sOutputFile="$tmp_out" \
+        "$PDF"
+
+    new_size=$(stat -c%s "$tmp_out")
+    echo "New size: $((new_size / 1024 / 1024)) MB"
+
+    if [ "$new_size" -le "$MAX_BYTES" ]; then
+        echo "Success: under ${MAX_MB}MB"
+        mv "$tmp_out" "${base}.under${MAX_MB}mb.pdf"
+        success=1
+        break
+    fi
+done
+
+if [ "$success" -eq 0 ]; then
+    echo "Could not get under ${MAX_MB}MB"
+    mv "$tmp_out" "${base}.best_compressed.pdf"
+fi
+
+echo "Done."

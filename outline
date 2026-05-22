@@ -1,0 +1,36 @@
+#!/bin/env bash
+
+# Check if PDF filename is given
+if [ -z "$1" ]; then
+  echo "Usage: $0 <input.pdf>"
+  exit 1
+fi
+
+pdf="$1"
+
+# Check if file exists
+if [ ! -f "$pdf" ]; then
+  echo "Error: File '$pdf' not found."
+  exit 1
+fi
+
+# Process the output of pdftk
+pdftk "$pdf" dump_data | awk '
+/BookmarkTitle/ {
+  title = $0
+  sub(/^BookmarkTitle: /, "", title)
+  next
+}
+
+/BookmarkLevel/ {
+  level = $0
+  sub(/^BookmarkLevel: /, "", level)
+
+  # Skip if title is just a number
+  if (title ~ /^[-+]?[0-9]+(\.[0-9]+)?$/) next
+
+  tabs = ""
+  for (i = 2; i <= level; i++) tabs = tabs "\t"
+  print tabs "- [ ] " title
+}
+'
