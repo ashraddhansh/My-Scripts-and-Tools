@@ -1,0 +1,46 @@
+#!/usr/bin/env python3
+
+import argparse
+import qrcode
+import qrcode.image.svg
+from pathlib import Path
+
+def generate_qr_svg(url, output):
+    factory = qrcode.image.svg.SvgPathImage
+
+    img = qrcode.make(
+        url,
+        image_factory=factory
+    )
+
+    img.save(output)
+
+    print(f"QR saved as: {output}")
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Generate QR SVG from a URL"
+    )
+
+    parser.add_argument(
+        "url",
+        help="URL to encode"
+    )
+
+    parser.add_argument(
+        "-o", "--output",
+        default="qr.svg",
+        help="Output filename (default: qr.svg)"
+    )
+
+    args = parser.parse_args()
+
+    output = Path(args.output)
+
+    if output.suffix != ".svg":
+        output = output.with_suffix(".svg")
+
+    generate_qr_svg(args.url, output)
+
+if __name__ == "__main__":
+    main()
