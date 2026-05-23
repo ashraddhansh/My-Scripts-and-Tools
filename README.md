@@ -20,3 +20,6 @@ Extracts and displays the outline or table of contents from a PDF or book.
 
 ## `table-to-csv`
 Converts HTML tables into CSV format.
+
+## `qr-code`
+Generate QR Codes of the URL when passed as argument.
