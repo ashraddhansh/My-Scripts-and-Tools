@@ -1,4 +1,4 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env bash
 
 # Check if the file path is provided as an argument
 if [ -z "$1" ]; then
@@ -7,7 +7,7 @@ if [ -z "$1" ]; then
 fi
 
 # Hyprpaper config file
-config_file="$HOME/.local/share/chezmoi/dot_config/hypr/hyprpaper.conf"
+config_file="$HOME/.config/hypr/hyprpaper.conf"
 
 # Resolve absolute path of the image
 new_image="$(realpath "$1")"
@@ -19,6 +19,5 @@ sed -i -E "s|^[[:space:]]*path[[:space:]]*=[[:space:]]*.*|    path = $new_image|
 # Restart Hyprpaper to apply changes
 killall hyprpaper 2>/dev/null
 nohup hyprpaper >/dev/null 2>&1 &
-chezmoi apply
 
 echo "Wallpaper updated to $new_image and Hyprpaper restarted."
