@@ -1,0 +1,33 @@
+#! /bin/env python3
+import os
+
+from collections import Counter
+CURRENT_DIR = "."
+
+all_files_nested = []
+all_files = []
+
+for root, dirs, files in os.walk(CURRENT_DIR):
+    all_files_nested.append(files)
+
+for sublist in all_files_nested:
+    all_files.extend(sublist)
+
+extensions = list(map(lambda x: x.split(".")[-1], all_files))
+
+freq = Counter(extensions)
+
+freq_sorted = dict(sorted(freq.items(), key=lambda item: item[1], reverse=True))
+reduced_freq = dict(list(freq_sorted.items())[:5])
+
+for key,value in reduced_freq.items():
+    print(f"\033[31m{key.upper()}\033[0m: \033[33m{value}\033[0m")
+
+# all could have been this find command
+
+# find . -type f \
+# | sed -n 's|.*\.||p' \
+# | sort \
+# | uniq -c \
+# | sort -nr \
+# | head -5

@@ -23,3 +23,6 @@ Converts HTML tables into CSV format.
 
 ## `qr-code`
 Generate QR Codes of the URL when passed as argument.
+
+## `repoinfo`
+Prints the language usage stats like GitHub in the local directory.
