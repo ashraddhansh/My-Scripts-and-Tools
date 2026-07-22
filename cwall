@@ -1,23 +1,16 @@
 #!/usr/bin/env bash
 
-# Check if the file path is provided as an argument
-if [ -z "$1" ]; then
-  echo "Usage: ./cwall /path/to/new_image.jpg"
-  exit 1
+if [ $# -eq 0 ]; then
+    echo "Usage: cwall <image>"
+    exit 1
 fi
 
-# Hyprpaper config file
-config_file="$HOME/.config/hypr/hyprpaper.conf"
+image=$(realpath "$1")
+config="$HOME/.config/hypr/hyprpaper.conf"
 
-# Resolve absolute path of the image
-new_image="$(realpath "$1")"
+sed -i \
+    -e "s|^preload = .*|preload = $image|" \
+    -e "s|^wallpaper = .*|wallpaper = ,$image|" \
+    "$config"
 
-# Update only the path inside the wallpaper block
-# This replaces any line starting with "path =" inside the file
-sed -i -E "s|^[[:space:]]*path[[:space:]]*=[[:space:]]*.*|    path = $new_image|" "$config_file"
-
-# Restart Hyprpaper to apply changes
-killall hyprpaper 2>/dev/null
-nohup hyprpaper >/dev/null 2>&1 &
-
-echo "Wallpaper updated to $new_image and Hyprpaper restarted."
+hyprctl hyprpaper wallpaper ",$image"
