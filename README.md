@@ -26,3 +26,6 @@ Generate QR Codes of the URL when passed as argument.
 
 ## `repoinfo`
 Prints the language usage stats like GitHub in the local directory.
+
+## `tmux-session-dispensary.sh`
+Opens a new tmux session in kitty terminal as per the input taken with `skim`

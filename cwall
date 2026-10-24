@@ -9,8 +9,7 @@ image=$(realpath "$1")
 config="$HOME/.config/hypr/hyprpaper.conf"
 
 sed -i \
-    -e "s|^preload = .*|preload = $image|" \
-    -e "s|^wallpaper = .*|wallpaper = ,$image|" \
+    -e "/^wallpaper {/,/^}/ s|^[[:space:]]*path = .*|    path = $image|" \
     "$config"
 
 hyprctl hyprpaper wallpaper ",$image"
